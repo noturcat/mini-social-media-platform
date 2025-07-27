@@ -6,7 +6,7 @@ const CONTENT_TYPES = ["posts", "blogs", "events", "people"];
 
 export default function NavbarSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null); 
 
