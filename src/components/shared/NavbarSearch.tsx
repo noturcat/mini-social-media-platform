@@ -1,14 +1,34 @@
 import { useState, useEffect, useRef } from "react";
 import typesense from "@/utils/typesenseClient";
-import SearchDropdown from "@/components/shared/SearchDropdown"; 
+import SearchDropdown from "@/components/shared/SearchDropdown";
+import type { SearchResponseHit } from 'typesense/lib/Typesense/Documents';
 
-const CONTENT_TYPES = ["posts", "blogs", "events", "people"];
+
+// Define supported content types
+const CONTENT_TYPES = ["posts", "blogs", "events", "people"] as const;
+type CollectionType = (typeof CONTENT_TYPES)[number];
+
+// Define a generic search document shape
+type BaseDocument = {
+  id: string;
+  title?: string;
+  body?: string;
+  name?: string;
+  email?: string;
+  bio?: string;
+  location?: string;
+};
+
+// Define a result type with collection info
+type SearchResult = BaseDocument & {
+  _type: CollectionType;
+};
 
 export default function NavbarSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null); 
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const search = async () => {
@@ -18,12 +38,12 @@ export default function NavbarSearch() {
       }
 
       try {
-        const allResults: string[] = [];
+        const allResults: SearchResult[] = [];
 
         await Promise.all(
           CONTENT_TYPES.map(async (collection) => {
             try {
-              const queryByMap: Record<string, string> = {
+              const queryByMap: Record<CollectionType, string> = {
                 posts: "title,body",
                 blogs: "title,body",
                 events: "title,location",
@@ -35,14 +55,17 @@ export default function NavbarSearch() {
                 .documents()
                 .search({
                   q: query,
-                  query_by: queryByMap[collection] || "title",
+                  query_by: queryByMap[collection],
                   per_page: 3,
                 });
 
-              const docs = res.hits?.map((hit: any) => ({
-                ...hit.document,
-                _type: collection, // Add type for routing/identification
-              })) || [];
+              const docs = res.hits?.map((hit: SearchResponseHit<object>) => {
+                const doc = hit.document as BaseDocument; // ✅ safe cast here
+                return {
+                  ...doc,
+                  _type: collection,
+                };
+              }) || []; 
 
               allResults.push(...docs);
             } catch (err) {
@@ -69,6 +92,7 @@ export default function NavbarSearch() {
         setShowDropdown(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);

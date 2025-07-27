@@ -1,13 +1,25 @@
 import { useState, useEffect } from "react";
 import typesense from "@/utils/typesenseClient";
+import type { SearchResponseHit } from "typesense/lib/Typesense/Documents";
+
+interface SearchResultDocument {
+  id: string;
+  title?: string;
+  body?: string;
+  [key: string]: unknown;
+}
 
 interface SearchBarProps {
   collection: string;
-  onResults: (results: string[]) => void;
+  onResults: (results: SearchResultDocument[]) => void;
   placeholder?: string;
 }
 
-export default function SearchBar({ collection, onResults, placeholder = "Search..." }: SearchBarProps) {
+export default function SearchBar({
+  collection,
+  onResults,
+  placeholder = "Search...",
+}: SearchBarProps) {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -23,21 +35,23 @@ export default function SearchBar({ collection, onResults, placeholder = "Search
           .documents()
           .search({
             q: query,
-            query_by: "title,body", // fields to search
+            query_by: "title,body",
             per_page: 10,
           });
 
-        onResults(searchResults.hits?.map((hit: string) => hit.document) || []);
+        const hits = searchResults.hits as SearchResponseHit<SearchResultDocument>[];
+        const documents = hits.map((hit) => hit.document);
+
+        onResults(documents);
       } catch (error) {
         console.error("Typesense search error:", error);
         onResults([]);
       }
     };
 
-    const delayDebounce = setTimeout(search, 300); // debounce
-
+    const delayDebounce = setTimeout(search, 300);
     return () => clearTimeout(delayDebounce);
-  }, [query]);
+  }, [query, collection, onResults]);
 
   return (
     <div className="w-full max-w-md mx-auto mb-6">

@@ -25,8 +25,11 @@ export default function LoginPage() {
       router.replace("/");
       router.reload(); // force Navbar to refresh
     } catch (err) {
-      errorSwal("Invalid credentials");
-    }
+        errorSwal("Failed to delete post.");
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
+      }
   };
 
   useEffect(() => {

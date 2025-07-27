@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { fetchPostById } from "@/api/posts"; // 👈 Make sure this exists
-import { Post } from "@/types/post"; // 👈 Your Post type
+import { useEffect, useState, useCallback } from "react";
+import { fetchPostById } from "@/api/posts";
+import { Post } from "@/types/post";
 import Link from "next/link";
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function PostDetailPage() {
   const router = useRouter();
@@ -12,7 +12,10 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadPost = async () => {
+  // ✅ Memoized loadPost to prevent useEffect warning
+  const loadPost = useCallback(async () => {
+    if (!id) return;
+
     try {
       const data = await fetchPostById(Number(id));
       setPost(data);
@@ -21,13 +24,13 @@ export default function PostDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]); // ✅ include `id` as dependency
 
   useEffect(() => {
     if (id) {
       loadPost();
     }
-  }, [id,loadPost]);
+  }, [id, loadPost]);
 
   if (loading) return <p className="text-center">Loading...</p>;
   if (!post) return <p className="text-center">Post not found</p>;
@@ -52,6 +55,8 @@ export default function PostDetailPage() {
             }}
             alt="Post Image"
             className="max-w-full max-h-96 rounded-lg border border-wanderer-border dark:border-scara-primary object-contain"
+            width={500}
+            height={500}
           />
         </div>
       )}

@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 
+// Define your user type
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+  [key: string]: unknown; // Optional if there are dynamic fields
+}
+
 export function useAuth() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load user from localStorage
@@ -9,7 +18,7 @@ export function useAuth() {
     try {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        setUser(JSON.parse(storedUser) as User);
       } else {
         setUser(null);
       }
@@ -22,8 +31,7 @@ export function useAuth() {
     }
   };
 
-
-  const loginUser = (userData: any, token: string) => {
+  const loginUser = (userData: User, token: string) => {
     if (userData && token) {
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("access_token", token);
@@ -32,7 +40,6 @@ export function useAuth() {
       console.warn("Missing user or token on login");
     }
   };
-
 
   const logoutUser = () => {
     localStorage.removeItem("user");

@@ -10,10 +10,11 @@ export default function PersonPage() {
   const { user, setUser } = useAuth();
   const router = useRouter();
   const { id } = router.query;
-  console.log(user.name);
+  console.log(user?.name);
   const [person, setPerson] = useState<Person | null>(null);
   const [loading, setLoading] = useState(true);
-
+  console.log(setLoading);
+  
   const loadPerson = useCallback(async () => {
     try {
       const res = await fetch(`/api/people/${id}`);
@@ -46,9 +47,9 @@ export default function PersonPage() {
         await logout();      // ✅ clear token and user
         setUser(null);       // ✅ update React state
         router.push("/login"); // redirect after delete
-      } catch (err: any) {
-        const message = err?.response?.data?.message || "Failed to delete.";
-        errorSwal(message);
+      } catch (error) {
+      console.error("Summarization failed:", error);
+      await errorSwal("Something went wrong while summarizing.");
       }
     }
   };

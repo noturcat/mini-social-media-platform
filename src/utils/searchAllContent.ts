@@ -1,4 +1,5 @@
 import typesense from "@/utils/typesenseClient";
+import { BaseItem } from "@/types/content";
 
 const QUERY_FIELDS: Record<string, string> = {
   posts: "title,body",
@@ -13,9 +14,9 @@ const HAS_TAGS_FIELD = ["posts", "blogs", "events"];
 export async function searchAllContent(
   query: string,
   collections: string[],
-  tags: string[] = []
+  tags: string[]
 ) {
-  const grouped: Record<string, string[]> = {};
+  const grouped: Record<string, BaseItem[]> = {};
 
   await Promise.all(
     collections.map(async (collection) => {
@@ -39,7 +40,7 @@ export async function searchAllContent(
           });
 
           
-        grouped[collection] = res.hits?.map((hit: any) => hit.document) || [];
+        grouped[collection] = res.hits?.map((hit) => hit.document as BaseItem) || [];
       } catch (err) {
         console.error(`❌ Failed to search in '${collection}':`, err);
         grouped[collection] = [];
