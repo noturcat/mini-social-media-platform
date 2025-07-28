@@ -5,8 +5,10 @@ export const login = async (email: string, password: string) => {
 
   const { token, user } = response.data;
 
-  localStorage.setItem("access_token", token);
-  localStorage.setItem("user", JSON.stringify(user));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("access_token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+  }
 
   return user;
 };
@@ -26,12 +28,13 @@ export const register = async (
 
   const { token, user } = response.data;
 
-  localStorage.setItem("access_token", token);
-  localStorage.setItem("user", JSON.stringify(user));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("access_token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+  }
 
   return user;
 };
-
 
 export const logout = () => {
   localStorage.removeItem("access_token");

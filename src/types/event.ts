@@ -3,4 +3,5 @@ export interface Event {
   title: string;
   location: string;
   time: string; // ISO string format
+  person_id: number;
 }

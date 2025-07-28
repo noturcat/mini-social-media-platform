@@ -3,4 +3,5 @@ export interface Blog {
   title: string;
   summary: string;
   body: string;
+  person_id: number;
 }

@@ -10,20 +10,36 @@ import Link from "next/link";
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Safely get the user ID from localStorage (SSR-safe)
+    if (typeof window !== "undefined") {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          setCurrentUserId(user.id);
+        } catch (e) {
+          console.error("Failed to parse user from localStorage:", e);
+        }
+      }
+    }
+  }, []);
 
   useEffect(() => {
     loadEvents();
   }, []);
 
   const loadEvents = async () => {
-      try {
-        const data = await fetchEvents();
-        setEvents(data);
-      } catch (err) {
-        console.error("Failed to reload posts:", err);
-        errorSwal("Could not reload posts.");
-      }
-    }; 
+    try {
+      const data = await fetchEvents();
+      setEvents(data);
+    } catch (err) {
+      console.error("Failed to reload events:", err);
+      errorSwal("Could not reload events.");
+    }
+  };
 
   const handleDelete = async (id: number) => {
     const result = await confirmSwal("This event will be permanently deleted.");
@@ -44,7 +60,8 @@ export default function EventsPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 font-thin text-wanderer-text dark:text-white transition-colors duration-300">
-      <ComposeEventBar onEventCreated={loadEvents}/>
+      <ComposeEventBar onEventCreated={loadEvents} />
+
       <h1 className="text-2xl font-elegant text-scara-gold dark:text-scara-gold mb-4">
         Events
       </h1>
@@ -63,26 +80,30 @@ export default function EventsPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400">
             🕒 {new Date(event.time).toLocaleString()}
           </p>
+
           <div className="flex justify-end gap-3 mt-3">
             <Link href={`/events/${event.id}`} key={event.id}>
-              <button
-                className="text-wanderer-primary dark:text-scara-card hover:underline"
-              >
+              <button className="text-wanderer-primary dark:text-scara-card hover:underline">
                 View
               </button>
             </Link>
-            <button
-              onClick={() => handleEdit(event)}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(event.id)}
-              className="text-sm text-red-500 hover:underline"
-            >
-              Delete
-            </button>
+
+            {currentUserId === event.person_id && (
+              <>
+                <button
+                  onClick={() => handleEdit(event)}
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  className="text-sm text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         </div>
       ))}
