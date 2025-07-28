@@ -2,8 +2,7 @@ import { Post } from "@/types/post";
 import { summarizeText } from "@/utils/summarize";
 import { useState, useEffect } from "react";
 import { showSummarySwal, errorSwal } from "@/utils/swal";
-import Link from "next/link";
-import Image from "next/image";
+import Link from "next/link"; 
 
 interface PostCardProps {
   post: Post;
@@ -53,7 +52,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
 
       {post.image_url && (
         <div className="mt-3 flex justify-center">
-          <Image
+          <img
             src={post.image_url || "/uploads/tignari.png"}
             onError={(e) => {
               e.currentTarget.onerror = null;
@@ -61,9 +60,7 @@ export default function PostCard({ post, onEdit, onDelete }: PostCardProps) {
             }}
             alt="Post"
             className="w-24 h-24 rounded-full object-cover"
-            width={96}
-            height={96}
-          />
+          /> 
         </div>
       )}
 

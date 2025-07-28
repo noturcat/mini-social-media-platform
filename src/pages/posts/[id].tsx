@@ -2,8 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState, useCallback } from "react";
 import { fetchPostById } from "@/api/posts";
 import { Post } from "@/types/post";
-import Link from "next/link";
-import Image from "next/image";
+import Link from "next/link"; 
 
 export default function PostDetailPage() {
   const router = useRouter();
@@ -47,17 +46,15 @@ export default function PostDetailPage() {
 
       {post.image_url && (
         <div className="mt-4 flex justify-center">
-          <Image
+          <img
             src={post.image_url || "/uploads/tignari.png"}
             onError={(e) => {
               e.currentTarget.onerror = null;
               e.currentTarget.src = "/uploads/tignari.png";
             }}
-            alt="Post Image"
-            className="max-w-full max-h-96 rounded-lg border border-wanderer-border dark:border-scara-primary object-contain"
-            width={500}
-            height={500}
-          />
+            alt="Post"
+            className="w-24 h-24 rounded-full object-cover"
+          /> 
         </div>
       )}
 
