@@ -1,5 +1,7 @@
 import api from "@/utils/api";
 
+import { AxiosError } from "axios";
+
 export const login = async (email: string, password: string) => {
   try {
     const response = await api.post("/api/login", { email, password });
@@ -17,21 +19,18 @@ export const login = async (email: string, password: string) => {
 
     return data.user;
   } catch (error: unknown) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "response" in error &&
-      error.response &&
-      typeof error.response === "object" &&
-      "data" in error.response
-    ) {
-      console.error("Login failed:", (error as any).response.data); // fallback if no better type is available
+    const axiosError = error as AxiosError<{ message?: string }>;
+
+    if (axiosError.response?.data?.message) {
+      console.error("Login failed:", axiosError.response.data.message);
     } else {
-      console.error("Login failed:", error);
+      console.error("Login failed:", axiosError.message);
     }
+
     throw new Error("Invalid login response");
   }
 };
+
 
 
 export const register = async (
