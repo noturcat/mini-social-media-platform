@@ -16,8 +16,19 @@ export const login = async (email: string, password: string) => {
     }
 
     return data.user;
-  } catch (error: any) {
-    console.error("Login failed:", error.response?.data || error.message);
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "response" in error &&
+      error.response &&
+      typeof error.response === "object" &&
+      "data" in error.response
+    ) {
+      console.error("Login failed:", (error as any).response.data); // fallback if no better type is available
+    } else {
+      console.error("Login failed:", error);
+    }
     throw new Error("Invalid login response");
   }
 };
