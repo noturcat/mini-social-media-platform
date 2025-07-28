@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/hooks/useAuth";
 import { successSwal, errorSwal } from "@/utils/swal";
 import { useEffect } from "react";
+import { login } from "@/api/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,26 +12,21 @@ export default function LoginPage() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const handleLogin = async () => {
+const handleLogin = async () => {
   try {
-    const storedUserRaw = localStorage.getItem("user");
+    const user = await login(email, password); // ⬅️ this stores token + user
     const token = localStorage.getItem("access_token");
 
-    if (!storedUserRaw || !token) {
+    if (!user || !token) {
       throw new Error("Invalid login response");
     }
 
-    const storedUser = JSON.parse(storedUserRaw);
-
-    // Set React auth state or context
-    loginUser(storedUser, token);
-
+    loginUser(user, token); // ⬅️ set React context/state
     await successSwal("Logged in successfully!");
-
-    router.replace("/"); // Redirect to home
-    router.reload(); // Refresh page to trigger any layout updates (like Navbar)
+    router.replace("/");
+    router.reload();
   } catch (err) {
-    await errorSwal("Login failed. Please try again.");
+    await errorSwal("Login failed. Please check your credentials.");
     if (err instanceof Error) {
       console.error(err.message);
     }
