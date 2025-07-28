@@ -1,17 +1,27 @@
 import api from "@/utils/api";
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post("/api/login", { email, password });
+  try {
+    const response = await api.post("/api/login", { email, password });
 
-  const { token, user } = response.data;
+    const data = response.data;
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("access_token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    if (!data || !data.token || !data.user) {
+      throw new Error("Invalid login response");
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("access_token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
+
+    return data.user;
+  } catch (error: any) {
+    console.error("Login failed:", error.response?.data || error.message);
+    throw new Error("Invalid login response");
   }
-
-  return user;
 };
+
 
 export const register = async (
   name: string,
