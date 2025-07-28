@@ -12,25 +12,31 @@ export default function LoginPage() {
   const { user } = useAuth();
 
   const handleLogin = async () => {
-    try { 
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const token = localStorage.getItem("access_token");
+  try {
+    const storedUserRaw = localStorage.getItem("user");
+    const token = localStorage.getItem("access_token");
 
-      if (!token || !storedUser) {
-        throw new Error("Invalid login response");
-      }
+    if (!storedUserRaw || !token) {
+      throw new Error("Invalid login response");
+    }
 
-      loginUser(storedUser, token); // set React state
-      await successSwal("Logged in successfully!");
-      router.replace("/");
-      router.reload(); // force Navbar to refresh
-    } catch (err) {
-        errorSwal("Failed to delete post.");
-        if (err instanceof Error) {
-          console.error(err.message);
-        }
-      }
-  };
+    const storedUser = JSON.parse(storedUserRaw);
+
+    // Set React auth state or context
+    loginUser(storedUser, token);
+
+    await successSwal("Logged in successfully!");
+
+    router.replace("/"); // Redirect to home
+    router.reload(); // Refresh page to trigger any layout updates (like Navbar)
+  } catch (err) {
+    await errorSwal("Login failed. Please try again.");
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+  }
+};
+
 
   useEffect(() => {
     if (user) {
