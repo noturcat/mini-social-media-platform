@@ -22,7 +22,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        elegant: ['"Cinzel"', "serif"],
+        elegant: ['"Open Sans"', "sans-serif"],
         thin: ['"Nunito"', "sans-serif"],
       },
     },
