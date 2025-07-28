@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Laravel + Vue Project Setup Guide
+📁 Project Structure
+my-project/
+├── backend/         # Laravel API
+└── frontend/        # Vue 3 App
 
-## Getting Started
+Repositories:
+Front-end: https://github.com/noturcat/mini-social-media-platform
+Back-end: https://github.com/noturcat/mini-social-media-platform-api
+⚙️ Backend Setup (Laravel)
+1. Navigate to the backend folder:
+   cd backend
 
-First, run the development server:
+2. Install PHP dependencies:
+   composer install
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+3. Copy the .env file and configure environment:
+   cp .env.example .env
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   Update the following in .env:
+   DB_DATABASE=msm
+   DB_USERNAME=root
+   DB_PASSWORD=
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Generate application key:
+   php artisan key:generate
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. Run migrations and seed the database:
+   php artisan migrate --seed
 
-## Learn More
+6. Start the Laravel development server:
+   php artisan serve
 
-To learn more about Next.js, take a look at the following resources:
+The API will now be running at http://localhost:8000
+🎨 Frontend Setup (Vue 3)
+1. Navigate to the frontend folder:
+   cd ../frontend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Install Node.js dependencies:
+   npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Copy the .env file and set your API base URL:
+   cp .env.example .env
 
-## Deploy on Vercel
+4. Start the development server:
+   npm run dev
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app will now be running at http://localhost:3000
+🔐 Authentication
+- Login/Register is handled via Local Storage.
+- Make sure cookies and CSRF are correctly handled if cross-origin.
+🔎 Optional: Typesense Search
+1. Run a Typesense server (locally or cloud)
+2. Add this to .env in Laravel:
+   TYPESENSE_HOST= http://1320sxdtl7kza4evp-1.a1.typesense.net/
+   TYPESENSE_API_KEY= n4JxGxNfZqzlt2h3qFUfnssZGhheWEXI
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Push documents to Typesense using:
+   Localhost:3000/api/typesense/sync-all
+🧪 Run Laravel Tests
+php artisan test
+✅ Done!
+Your Laravel + Vue 3 app is now ready.
+Feel free to customize and scale it up!
