@@ -5,6 +5,7 @@ import { Person } from "@/types/person";
 import { editPersonSwal, confirmSwal, successSwal, errorSwal } from "@/utils/swal";
 import { logout } from "@/api/auth"; 
 import { useAuth } from "@/hooks/useAuth";
+import { fetchPersonById } from "@/api/peoples";
 
 export default function PersonPage() {
   const { user, setUser } = useAuth();
@@ -17,13 +18,14 @@ export default function PersonPage() {
   
   const loadPerson = useCallback(async () => {
     try {
-      const res = await fetch(`/api/people/${id}`);
-      const data = await res.json();
+      const data = await fetchPersonById(Number(id));
       setPerson(data);
     } catch (err) {
       console.error("Failed to load person:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [id]); // include `id` if used inside
+  }, [id]);
 
   useEffect(() => {
     if (id) {
